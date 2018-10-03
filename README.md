@@ -15,7 +15,7 @@ module "gcf_api_police" {
 }
 ```
 
-## Test and Verify. 
+## Test and Verify
 
 If you deployed the Cloud Function without modifying the list `translate.googleapis.com` should be blocked. 
 ```shell
