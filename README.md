@@ -7,7 +7,6 @@ This module is a way to deploy a custom Cloud Function that monitors and disable
 ```hcl
 module "gcf_api_police" {
   source = "github.com/terraform-google-modules/terraform-google-api-police"
-  
   project_id = "reechar-gcp-api-police"              #Change to unique project ID
   org_id     = "1234567890"                          #Change to org id for Organization to be monitored
   billing_id = "ABCDEF-ABCDEF-ABCDEF"                #Change to your billing account
