@@ -1,0 +1,63 @@
+/**
+ * Copyright 2018 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ 'use strict';
+const { google } = require('googleapis');
+const servicemanagement = google.servicemanagement('v1');
+
+let authenticationClient;
+getAuthClient();
+
+function getAuthClient() {
+  google.auth.getClient({
+    scopes: ['https://www.googleapis.com/auth/compute',
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/service.management']
+  }).then(function (authClient) {
+    authenticationClient = authClient;
+  })
+}
+
+exports.apiPolice = (event, callback) => {
+  const pubsubMessage = event.data;
+  const cloudAuditLogMsg = JSON.parse(Buffer.from(pubsubMessage.data, 'base64').toString())
+  const accountID = cloudAuditLogMsg.protoPayload.authenticationInfo.principalEmail
+  const resourceName = cloudAuditLogMsg.protoPayload.resourceName;
+  var apiName;
+  if (cloudAuditLogMsg.protoPayload.methodName.endsWith('ActivateServices')){
+    apiName = resourceName.substring(resourceName.indexOf('[')+1, resourceName.indexOf(']'))
+  } else {
+    apiName = resourceName.substring(resourceName.lastIndexOf('/')+1)
+  }
+  const projectID = "project:" + cloudAuditLogMsg.resource.labels.project_id
+  const blockedList = ${blockedList}
+
+  console.log(`$${accountID} attempted to activate $${apiName} in $${projectID}`)
+  if (blockedList.indexOf(apiName) > -1) {
+    console.error(`$${apiName} is on the blocked API list and will be disabled`);
+    servicemanagement.services.disable({ auth: authenticationClient, serviceName: apiName, requestBody: { consumerId: projectID } })
+      .then(function (response) {
+        callback(null, 'Success!');
+      })
+      .catch(function (error) {
+        callback(new Error('Failed'));
+      });
+  } else {
+    console.log(`$${apiName} not blocked`);
+    callback(null, 'Success!');
+  }
+
+}
