@@ -17,7 +17,7 @@ module "gcf_api_police" {
 
 ## Test and Verify
 
-If you deployed the Cloud Function without modifying the list `translate.googleapis.com` should be blocked. 
+If you deployed the Cloud Function without modifying the list `translate.googleapis.com` should be blocked.
 ```shell
 $ gcloud config set project <project_id that you used in step 4>
 $ gcloud services list #list currently enabled APIs in project
