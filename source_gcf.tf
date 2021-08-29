@@ -15,10 +15,10 @@
  */
 
 data "template_file" "cf" {
-  template = "${file("${path.module}/index.js.tftemplate")}"
+  template = file("${path.module}/index.js.tftemplate")
 
   vars {
-    blockedList = "${jsonencode(var.blocked_apis_list)}"
+    blockedList = jsonencode(var.blocked_apis_list)
   }
 }
 
@@ -27,23 +27,23 @@ data "archive_file" "gcf_zip_file" {
   output_path = "gcf.zip"
 
   source {
-    content  = "${data.template_file.cf.rendered}"
+    content  = data.template_file.cf.rendered
     filename = "index.js"
   }
 
   source {
-    content  = "${file("${path.module}/package.json")}"
+    content  = file("${path.module}/package.json")
     filename = "package.json"
   }
 }
 
 resource "google_storage_bucket" "gcf_source_bucket" {
-  name    = "${var.gcs_bucket}"
-  project = "${google_project.api_police_project.project_id}"
+  name    = var.gcs_bucket
+  project = google_project.api_police_project.project_id
 }
 
 resource "google_storage_bucket_object" "gcf_zip_gcs_object" {
   name   = "gcf.zip"
-  bucket = "${google_storage_bucket.gcf_source_bucket.name}"
-  source = "${data.archive_file.gcf_zip_file.output_path}"
+  bucket = google_storage_bucket.gcf_source_bucket.name
+  source = data.archive_file.gcf_zip_file.output_path
 }
