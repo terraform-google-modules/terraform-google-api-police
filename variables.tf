@@ -40,6 +40,6 @@ variable "gcs_bucket" {
 }
 
 variable "blocked_apis_list" {
-  type        = "list"
+  type        = list(string)
   description = "list of APIs to prevent being used"
 }
