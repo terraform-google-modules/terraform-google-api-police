@@ -15,17 +15,17 @@
  */
 
 terraform {
-required_version = ">= 0.13"
-required_providers {
+  required_version = ">= 0.13"
+  required_providers {
 
-google = {
-	source  = "hashicorp/google"
-	version = "~> 3.53"
-}
-}
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 3.53, < 5.0"
+    }
+  }
 
-provider_meta "google" {
-	module_name = "blueprints/terraform/terraform-google-api-police/v1.0.0"
-}
+  provider_meta "google" {
+    module_name = "blueprints/terraform/terraform-google-api-police/v1.0.0"
+  }
 
 }
